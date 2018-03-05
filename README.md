@@ -272,9 +272,9 @@ When used as the protocol for the delivery of subdivided messages SRARQ works so
 
 ## References
 
-[1]: EME 2000 - http://www.ka9q.net/papers/eme-2000.ps.gz
-[2]: The JT65 Communications Protocol - http://www.arrl.org/files/file/18JT65.pdf
-[3]: SWIM: Scalable Weakly-consistent Infection-style Process Group Membership Protocol - https://pdfs.semanticscholar.org/8712/3307869ac84fc16122043a4a313604bd948f.pdf
-[4]: WSPR Coding Process -  http://www.g4jnt.com/Coding/WSPR_Coding_Process.pdf
-[5]: ARQ - https://en.m.wikipedia.org/wiki/Selective_Repeat_ARQ
-[6]: Maidenhead Grid - http://www.jidanni.org/geo/maidenhead/index.html
+- [1]: EME 2000 - http://www.ka9q.net/papers/eme-2000.ps.gz
+- [2]: The JT65 Communications Protocol - http://www.arrl.org/files/file/18JT65.pdf
+- [3]: SWIM: Scalable Weakly-consistent Infection-style Process Group Membership Protocol - https://pdfs.semanticscholar.org/8712/3307869ac84fc16122043a4a313604bd948f.pdf
+- [4]: WSPR Coding Process -  http://www.g4jnt.com/Coding/WSPR_Coding_Process.pdf
+- [5]: ARQ - https://en.m.wikipedia.org/wiki/Selective_Repeat_ARQ
+- [6]: Maidenhead Grid - http://www.jidanni.org/geo/maidenhead/index.html
