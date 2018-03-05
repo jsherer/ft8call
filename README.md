@@ -1,5 +1,10 @@
 # FT8Call Design Document
 
+Author: Jordan Sherer (KN4CRD)  
+Created: March 4, 2018  
+
+---
+
 FT8 has taken over the airwaves as _the_ digital communication mode for making QSOs over HF/VHF/UHF. The mode has been widely popular as the latest mode offered in the WSJT-X application. It stands on the shoulders of JT65, JT9, and WSPR modes for weak signal communication, but much faster.
 
 While FT8 is an incredibly robust weak signal mode, it only offers a minimal QSO operation framework, designed heavily to take advantage of short band openings on VHF/UHF. However, many operators are using these weak signal properties successfully on the HF bands. 
@@ -274,7 +279,7 @@ Direct Command (station info):
 
 ### SRARQ - selective repeat - automatic repeat requests
 
-When used as the protocol for the delivery of subdivided messages SRARQ works somewhat differently. In non-continuous channels where messages may be variable in length, standard ARQ or Hybrid ARQ protocols may treat the message as a single unit. Alternately selective retransmission may be employed in conjunction with the basic ARQ mechanism where the message is first subdivided into sub-blocks (typically of fixed length) in a process called packet segmentation. The original variable length message is thus represented as a concatenation of a variable number of sub-blocks. While in standard ARQ the message as a whole is either acknowledged (ACKed) or negatively acknowledged (NAKed), in ARQ with selective transmission the ACK response would additionally carry a bit flag indicating the identity of each sub-block successfully received. In ARQ with selective retransmission of sub-divided messages each retransmission diminishes in length, needing to only contain the sub-blocks that were linked. [5]
+> When used as the protocol for the delivery of subdivided messages SRARQ works somewhat differently. In non-continuous channels where messages may be variable in length, standard ARQ or Hybrid ARQ protocols may treat the message as a single unit. Alternately selective retransmission may be employed in conjunction with the basic ARQ mechanism where the message is first subdivided into sub-blocks (typically of fixed length) in a process called packet segmentation. The original variable length message is thus represented as a concatenation of a variable number of sub-blocks. While in standard ARQ the message as a whole is either acknowledged (ACKed) or negatively acknowledged (NAKed), in ARQ with selective transmission the ACK response would additionally carry a bit flag indicating the identity of each sub-block successfully received. In ARQ with selective retransmission of sub-divided messages each retransmission diminishes in length, needing to only contain the sub-blocks that were linked. [5]
 
 ## References
 
