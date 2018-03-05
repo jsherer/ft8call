@@ -16,11 +16,11 @@ The idea here is to take the robustness of FT8 mode and layer on a messaging and
 
 ## Channel Allocation
 
-Modes like FSQ and HFAPRS allocate a single channel for their communication. This is useful for keeping the bandwidth of transmissios in a reasonable range. However, stations within a single channel may cause each other interference when transmitting over to of each other.
+Modes like FSQ and HFAPRS allocate a single channel for their communication. This is useful for keeping the bandwidth of transmissions restricted to a reasonable range. However, stations within a single channel may cause each other interference when transmitting over top of each other.
 
-Thankfully, FT8 mode transmissions are sent in a 50Hz bandwidth. What we can do is leverage this small bandwidth to allot several channels for multiple, parallel transmissions in-network. We can leverage the FT8 multi-decoder to allow for synchronized transmissions for multiple stations without overlapping / competing signals. 
+On the other hand, FT8 mode transmissions are sent in a 50Hz bandwidth. What we can do is leverage this small bandwidth to allot several channels for multiple, parallel in-network transmissions. We can leverage the FT8 multi-decoder to allow for synchronized transmissions for multiple stations without overlapping / competing signals. 
 
-How? We'll use 1500Hz as the center of the passband for our frequency, then use 50Hz channels above and below the center frequency spaced 10Hz apart 
+How? We'll use 1500Hz as the center of the passband for our frequency, then use 50Hz channels above and below the center frequency spaced 10Hz apart. 
 
 ```
 |                         1500Hz                         |
@@ -56,29 +56,29 @@ There will be two primary types of messages, each with sub-types:
     * Command Requests
     * Acks (automated)
     * Free Text
-    * Relay Free Text (automated)
+    * Free Text Relays (automated)
 
 Sounding messages would be used to announce a station to all listeners. Directed messages would be used to send commands or messages back and forth between stations. 
 
 ### Sounding
 
-We could use the SWIM protocol for managing the network membership list. Basically, an efficient gossip mechanism to announce joins to the network. 
+We could use the SWIM protocol [3] for managing the network membership list. Basically, an efficient gossip mechanism to announce joins to the network. 
 
 We wouldn't need to worry about dead links for the most part unless we wanted to clean up the heard list over time. Displaying time since last heard would be a nice to have. 
 
-We could piggyback on sounding for disseminating any known membership changes. Sounding could occur on a random channel in the passband at a random minute offset if network membership changed. 
+We could piggyback on periodic sounding for disseminating any known membership changes. Sounding could occur on a random channel in the passband at a random minute offset if network membership changed. 
 
 Receiving sounding with membership information could allow us to include 2-hop stations in the "heard" list.
 
 ### Directed 
 
-Directed messages would be used to send information across the network. This could be commands to other stations, messages to other stations, or relays through other stations. 
+Directed messages would be used to send information across the network. These could be commands to other stations, messages to other stations, or relays through other stations. 
 
 ### Structure
 
 FT8 transmissions carry 75-bits of information. This information is transmitted redundantly using forward error correction. Normal FT8 transmissions are 72-bits long with 3-bits left unused. FT8 free text transmissions are 13 characters long at 5 bits per character, for a total of 65 bits.
 
-We know that the EME paper [1] describes an efficient way to encode all known amateur radio callsigns in 28-bits of information. This is what JT65 [2] (and FT8) uses for their minimal QSO message packing. With this in mind, we can develop a simple command message protocol where most non-freetext messages are passed with only one 15-second FT8 transmission.
+We know that the EME 2000 paper [1] describes an efficient way to encode all known amateur radio callsigns in 28-bits of information. This is what JT65 [2] (and FT8) uses for their minimal QSO message packing. With this in mind, we can develop a simple command message protocol where most non-freetext messages are passed with only one 15-second FT8 transmission.
 
 #### Base Message
 
@@ -113,9 +113,9 @@ We know that the EME paper [1] describes an efficient way to encode all known am
 +----------+----------+---------------+-----------+
 ```
 
-Data can encode any information within 44-bits
+**Data:** Can _technically_ encode any information that can fit in 44-bits.
 
-Likely candidates: 
+Here are some likely candidates: 
 
 * Sounding Type (3 bits)
 * 8 text characters (40 bits)
@@ -146,7 +146,7 @@ Likely candidates:
 Sounding messages should include a sounding command when another callsign is sent along to identify if the sounding is a request or is a notification.
 
 
-#### Directed Message
+#### Directed Header
 
 Message stream (Frame 1): 
 ```
@@ -170,8 +170,7 @@ Message stream (Frame 1):
 
 **Args:** Arguments to the directed command, likely 8 bit int
 
-
----
+#### Directed Data
 
 Message stream continuations (Frames 2 through n): 
 ```
@@ -187,8 +186,6 @@ Message stream continuations (Frames 2 through n):
 **Data:** Huffman encoded varicode data
 
 **CRC:** The last frame of the message should include a CRC of the message to ensure it was correctly assembled.
-
-
 
 ### Message Examples
 
@@ -207,15 +204,16 @@ Message stream continuations (Frames 2 through n):
     * [callsign]:$ - what stations have you heard?
     * [callsign]:% - what is your station information?
 
+#### Example Encodings
 
 
-Sounding Exmamples: 
-
+Sounding:
 ```
    1  2   28      3     15    15    3   
 ->[0][01][KN4CRD][PING][EM73][TU00][5W] = 67
 ```
 
+Sounding Request & Reply:
 ```
    1  2   28      3        28     
 ->[0][01][KN4CRD][PINGREQ][OH8STN] = 62
@@ -223,15 +221,13 @@ Sounding Exmamples:
 <-[0][01][VA3OSO][SEEN][OH8STN][-15dB] = 66
 ```
 
+Membership Change:
 ```
    1  2   28      3     28      4
 ->[0][01][KN4CRD][SEEN][OH8STN][-15dB] = 66
 ```
 
-
-Direct Examples: 
-
-Direct Free Text: 
+Direct Free Text (2 frames): 
 ```
    1  2   28      28      4        4    8        
 ->[1][00][KN4CRD][KN4CRD][1 FRAME][MSG][00000000] = 75 
@@ -241,7 +237,7 @@ Direct Free Text:
 
 Direct Command (report): 
 ```
-   1  1   28      28      4         4      8
+   1  2   28      28      4         4      8
 ->[0][00][KN4CRD][OH8STN][0 FRAMES][CMD ?][00000000] = 75
    1  2   28      3     28      4
 <-[0][01][OH8STN][SEEN][KN4CRD][-15dB] = 66
@@ -255,6 +251,16 @@ Direct Command (heard list)
 <-[1][01][OH8STN][SEEN][KN4CRD][-16dB] = 66
 <-[1][01][OH8STN][SEEN][ K1JT ][-12dB] = 66
 <-[0][01][OH8STN][SEEN][ K4YY ][-02dB] = 66
+
+-- but, we _could_ also encode this in freetext if we omit the sender --
+
+   1  2   28      28      4         4      8
+->[1][00][KN4CRD][OH8STN][0 FRAMES][CMD $][000000000] = 75
+   1  2   28      28      4         4     8
+<-[1][00][OH8STN][KN4CRD][1 FRAMES][LIST][000000000] = 75
+   1  2   3    28    4      28    4 
+<-[0][01][110][K4YY][-16dB][K1JT][-12dB] = 69
+
 ```
 
 Direct Command (station info): 
